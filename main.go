@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"net"
 
 	rds "github.com/go-redis/redis/v8"
@@ -23,13 +22,13 @@ func main() {
 		log.WithError(err).Fatal()
 	}
 	rep := repository.Redis{Client: client}
-	dtChan, err := rep.ListenChanel(context.Background())
+
 	if err != nil {
 		log.WithError(err).Fatal()
 	}
 	grpcServer := grpc.NewServer()
 	handlers.RegisterPriceServer(grpcServer, &handlers.PriceServerImplement{Rep: &rep})
-	handlers.RegisterPriceStreamingServer(grpcServer, handlers.NewPriceStreamingServerImplement(dtChan))
+	handlers.RegisterPriceStreamingServer(grpcServer, handlers.NewPriceStreamingServerImplement(&rep))
 	log.Info("gRPC server start")
 	log.Info(grpcServer.Serve(listener))
 	log.Info("gRPC server Stop")

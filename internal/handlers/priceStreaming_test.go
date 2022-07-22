@@ -12,7 +12,7 @@ import (
 )
 
 func TestHighLoadStreamPriceService(t *testing.T) {
-	countClients := 1000
+	countClients := 5000
 
 	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

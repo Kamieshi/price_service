@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
 	"priceService/internal/models"
@@ -11,14 +12,19 @@ import (
 )
 
 type StreamingMap struct {
+	owner      *ClientManager
+	name       string
 	ch         chan *models.Price
 	StreamsMap map[*PriceStreaming_HighLoadStreamServer]PriceStreaming_HighLoadStreamServer
 	sync.RWMutex
 }
 
-func (s *StreamingMap) Stream() {
+func (s *StreamingMap) Stream(cancelFunc context.CancelFunc) {
 	for {
-		data := <-s.ch
+		data, ok := <-s.ch
+		if !ok {
+			log.Fatalf("sad")
+		}
 		connectionFromDelete := make([]*PriceStreaming_HighLoadStreamServer, 0, 100)
 		for addr, m := range s.StreamsMap {
 			err := m.Send(&GetPriceStreamResponse{
@@ -31,7 +37,7 @@ func (s *StreamingMap) Stream() {
 				Time: data.Time,
 			})
 			if err != nil {
-				log.WithError(err).Error(" incorrect stream connection ")
+				log.WithError(err).Info(" incorrect stream connection ")
 				connectionFromDelete = append(connectionFromDelete, addr)
 			}
 		}
@@ -41,7 +47,10 @@ func (s *StreamingMap) Stream() {
 			s.RWMutex.Unlock()
 		}
 		if len(s.StreamsMap) == 0 {
-			close(s.ch)
+			cancelFunc()
+			defer func() {
+				delete(s.owner.StreamingMaps, s.name)
+			}()
 			break
 		}
 	}
@@ -50,36 +59,40 @@ func (s *StreamingMap) Stream() {
 
 type ClientManager struct {
 	rep           *repository.Redis
-	StreamingMaps []*StreamingMap
+	StreamingMaps map[string]*StreamingMap
 	sync.RWMutex
 }
 
 func NewClientManager(rep *repository.Redis) *ClientManager {
 	return &ClientManager{
 		rep:           rep,
-		StreamingMaps: make([]*StreamingMap, 0),
+		StreamingMaps: make(map[string]*StreamingMap, 0),
 	}
 }
 
 func (c *ClientManager) Add(resp PriceStreaming_HighLoadStreamServer) {
 	for _, sm := range c.StreamingMaps {
-		if len(sm.StreamsMap) < 100 {
+		if len(sm.StreamsMap) < 500 {
 			sm.Lock()
 			sm.StreamsMap[&resp] = resp
 			sm.Unlock()
 			return
 		}
 	}
-	ch, err := c.rep.ListenChanel(context.Background())
+	ctx, cFunc := context.WithCancel(context.Background())
+	ch, err := c.rep.ListenChanel(ctx)
 	if err != nil {
 		log.WithError(err).Fatal()
 	}
 	c.Lock()
-	c.StreamingMaps = append(c.StreamingMaps, &StreamingMap{
+	newName := uuid.New().String()
+	c.StreamingMaps[newName] = &StreamingMap{
+		owner:      c,
+		name:       newName,
 		StreamsMap: make(map[*PriceStreaming_HighLoadStreamServer]PriceStreaming_HighLoadStreamServer),
 		ch:         ch,
-	})
-	c.StreamingMaps[len(c.StreamingMaps)-1].StreamsMap[&resp] = resp
+	}
+	c.StreamingMaps[newName].StreamsMap[&resp] = resp
 	c.Unlock()
-	go c.StreamingMaps[len(c.StreamingMaps)-1].Stream()
+	go c.StreamingMaps[newName].Stream(cFunc)
 }

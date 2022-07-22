@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"time"
+	"context"
 
 	"priceService/internal/repository"
 )
 
 type PriceStreamingServerImplement struct {
+	ctx           context.Context
 	clientManager *ClientManager
 	PriceStreamingServer
 }
@@ -14,12 +15,13 @@ type PriceStreamingServerImplement struct {
 func NewPriceStreamingServerImplement(rep *repository.Redis) *PriceStreamingServerImplement {
 	clMng := NewClientManager(rep)
 	return &PriceStreamingServerImplement{
+		ctx:           context.Background(),
 		clientManager: clMng,
 	}
 }
 
 func (p *PriceStreamingServerImplement) HighLoadStream(req *GetPriceStreamRequest, resp PriceStreaming_HighLoadStreamServer) error {
 	p.clientManager.Add(resp)
-	time.Sleep(1 * time.Minute)
-	return nil
+	<-resp.Context().Done()
+	return resp.Context().Err()
 }

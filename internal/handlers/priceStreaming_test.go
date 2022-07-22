@@ -12,7 +12,7 @@ import (
 )
 
 func TestHighLoadStreamPriceService(t *testing.T) {
-	countClients := 5000
+	countClients := 1
 
 	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -45,5 +45,5 @@ func TestHighLoadStreamPriceService(t *testing.T) {
 	for i := 0; i < countClients; i++ {
 		go runClient(i)
 	}
-	time.Sleep(100 * time.Second)
+	time.Sleep(100 * time.Minute)
 }

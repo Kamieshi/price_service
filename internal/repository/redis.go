@@ -37,9 +37,9 @@ func (r *Redis) ListenChanel(ctx context.Context) (chan *models.Price, error) {
 			select {
 			case <-ctx.Done():
 				r.Client.XGroupDestroy(context.Background(), "prices", nameGroup)
+				close(ch)
 				return
 			default:
-
 				resCmd := r.Client.XReadGroup(ctx, &args)
 				if resCmd.Err() != nil {
 					logrus.WithError(resCmd.Err()).Error()
@@ -55,6 +55,7 @@ func (r *Redis) ListenChanel(ctx context.Context) (chan *models.Price, error) {
 							logrus.WithError(err).Error("Error parsing")
 							continue
 						}
+
 						ch <- &pr
 					}
 				}

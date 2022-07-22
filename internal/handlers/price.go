@@ -22,7 +22,6 @@ func (p *PriceServerImplement) GetPriceStream(req *GetPriceStreamRequest, resp P
 	if err != nil {
 		log.WithError(err)
 	}
-
 	for m := range chResp {
 		err := resp.Send(&GetPriceStreamResponse{
 			Company: &Company{
@@ -33,8 +32,10 @@ func (p *PriceServerImplement) GetPriceStream(req *GetPriceStreamRequest, resp P
 			Bid:  m.Bid,
 			Time: m.Time,
 		})
+
 		if err != nil {
-			log.WithError(err).Error()
+			log.WithError(err).Info(req.sizeCache)
+			break
 		}
 	}
 	return errors.New("listening was stopped")

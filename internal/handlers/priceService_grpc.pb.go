@@ -130,3 +130,116 @@ var Price_ServiceDesc = grpc.ServiceDesc{
 	},
 	Metadata: "priceService.proto",
 }
+
+// PriceStreamingClient is the client API for PriceStreaming service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PriceStreamingClient interface {
+	HighLoadStream(ctx context.Context, in *GetPriceStreamRequest, opts ...grpc.CallOption) (PriceStreaming_HighLoadStreamClient, error)
+}
+
+type priceStreamingClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPriceStreamingClient(cc grpc.ClientConnInterface) PriceStreamingClient {
+	return &priceStreamingClient{cc}
+}
+
+func (c *priceStreamingClient) HighLoadStream(ctx context.Context, in *GetPriceStreamRequest, opts ...grpc.CallOption) (PriceStreaming_HighLoadStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PriceStreaming_ServiceDesc.Streams[0], "/priceService.PriceStreaming/HighLoadStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &priceStreamingHighLoadStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type PriceStreaming_HighLoadStreamClient interface {
+	Recv() (*GetPriceStreamResponse, error)
+	grpc.ClientStream
+}
+
+type priceStreamingHighLoadStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *priceStreamingHighLoadStreamClient) Recv() (*GetPriceStreamResponse, error) {
+	m := new(GetPriceStreamResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// PriceStreamingServer is the server API for PriceStreaming service.
+// All implementations must embed UnimplementedPriceStreamingServer
+// for forward compatibility
+type PriceStreamingServer interface {
+	HighLoadStream(*GetPriceStreamRequest, PriceStreaming_HighLoadStreamServer) error
+	mustEmbedUnimplementedPriceStreamingServer()
+}
+
+// UnimplementedPriceStreamingServer must be embedded to have forward compatible implementations.
+type UnimplementedPriceStreamingServer struct {
+}
+
+func (UnimplementedPriceStreamingServer) HighLoadStream(*GetPriceStreamRequest, PriceStreaming_HighLoadStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method HighLoadStream not implemented")
+}
+func (UnimplementedPriceStreamingServer) mustEmbedUnimplementedPriceStreamingServer() {}
+
+// UnsafePriceStreamingServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PriceStreamingServer will
+// result in compilation errors.
+type UnsafePriceStreamingServer interface {
+	mustEmbedUnimplementedPriceStreamingServer()
+}
+
+func RegisterPriceStreamingServer(s grpc.ServiceRegistrar, srv PriceStreamingServer) {
+	s.RegisterService(&PriceStreaming_ServiceDesc, srv)
+}
+
+func _PriceStreaming_HighLoadStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetPriceStreamRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(PriceStreamingServer).HighLoadStream(m, &priceStreamingHighLoadStreamServer{stream})
+}
+
+type PriceStreaming_HighLoadStreamServer interface {
+	Send(*GetPriceStreamResponse) error
+	grpc.ServerStream
+}
+
+type priceStreamingHighLoadStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *priceStreamingHighLoadStreamServer) Send(m *GetPriceStreamResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+// PriceStreaming_ServiceDesc is the grpc.ServiceDesc for PriceStreaming service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var PriceStreaming_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "priceService.PriceStreaming",
+	HandlerType: (*PriceStreamingServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "HighLoadStream",
+			Handler:       _PriceStreaming_HighLoadStream_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "priceService.proto",
+}

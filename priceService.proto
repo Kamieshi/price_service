@@ -5,6 +5,11 @@ package priceService;
 
 service Price{
   rpc GetPriceStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
+
+}
+
+service PriceStreaming{
+  rpc HighLoadStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
 }
 
 message GetPriceStreamRequest{}

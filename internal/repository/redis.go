@@ -39,6 +39,7 @@ func (r *Redis) ListenChanel(ctx context.Context) (chan *models.Price, error) {
 				r.Client.XGroupDestroy(context.Background(), "prices", nameGroup)
 				return
 			default:
+
 				resCmd := r.Client.XReadGroup(ctx, &args)
 				if resCmd.Err() != nil {
 					logrus.WithError(resCmd.Err()).Error()

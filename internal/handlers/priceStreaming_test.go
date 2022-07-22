@@ -11,40 +11,16 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func TestGetPriceStream(t *testing.T) {
-	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("fail to dial: %v", err)
-	}
-	client := NewPriceClient(conn)
-	stream, err := client.GetPriceStream(context.Background(), &GetPriceStreamRequest{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	for {
-		data, err := stream.Recv()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		tt, err := time.Parse("2006-01-02T15:04:05.000TZ-07:00", data.Time)
-		fmt.Println(time.Since(tt))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-}
-
-func TestHighLoad(t *testing.T) {
+func TestHighLoadStreamPriceService(t *testing.T) {
 	countClients := 1000
 
 	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
-	client := NewPriceClient(conn)
+	client := NewPriceStreamingClient(conn)
 	runClient := func(numb int) {
-		stream, err := client.GetPriceStream(context.Background(), &GetPriceStreamRequest{})
+		stream, err := client.HighLoadStream(context.Background(), &GetPriceStreamRequest{})
 		if err != nil {
 			t.Fatal(err)
 		}

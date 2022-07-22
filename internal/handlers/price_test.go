@@ -36,7 +36,7 @@ func TestGetPriceStream(t *testing.T) {
 }
 
 func TestHighLoad(t *testing.T) {
-	countClients := 1000
+	countClients := 1
 
 	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -55,9 +55,8 @@ func TestHighLoad(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			t_s := time.Now()
 			tt, err := time.Parse("2006-01-02T15:04:05.000TZ-07:00", data.Time)
-			sum += t_s.Sub(tt).Nanoseconds()
+			sum += time.Since(tt).Nanoseconds()
 			count += 1
 			if count == 100 && numb == 0 {
 				fmt.Println(countClients, "clients  AVG : ", time.Duration(sum/100))

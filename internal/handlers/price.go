@@ -1,4 +1,4 @@
-// Package handlers  handler for work with gRPC server
+// Package handlers'  handler for work with gRPC server
 package handlers
 
 import (

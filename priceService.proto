@@ -1,0 +1,22 @@
+syntax = "proto3";
+option go_package = "/internal/handlers";
+package priceService;
+
+
+service Price{
+  rpc GetPriceStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
+}
+
+message GetPriceStreamRequest{}
+
+message GetPriceStreamResponse {
+  Company Company = 1;
+  uint32 Ask = 2 ;
+  uint32 Bid = 3;
+  string Time = 4;
+}
+
+message Company{
+  string ID = 1 ;
+  string Name = 2;
+}

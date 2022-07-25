@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: priceService.proto
+// source: protoc/priceService.proto
 
 package protoc
 
@@ -128,7 +128,7 @@ var OwnPriceStream_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "priceService.proto",
+	Metadata: "protoc/priceService.proto",
 }
 
 // CommonPriceStreamClient is the client API for CommonPriceStream service.
@@ -241,5 +241,5 @@ var CommonPriceStream_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "priceService.proto",
+	Metadata: "protoc/priceService.proto",
 }

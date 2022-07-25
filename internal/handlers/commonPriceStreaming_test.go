@@ -39,7 +39,7 @@ func Loader(client protoc.CommonPriceStreamClient, countClients int, pr bool) {
 }
 
 func TestHighLoadStreamPriceService(t *testing.T) {
-	countClients := 100
+	countClients := 1
 	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)

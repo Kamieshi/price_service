@@ -13,21 +13,16 @@ import (
 
 // CommonPriceStreamServerImplement Implement gRPC interface PriceStreamingServer
 type CommonPriceStreamServerImplement struct {
-	ch        chan models.Price
-	listeners *service.Listeners
+	poolListeners *service.PoolListeners
 	protoc.CommonPriceStreamServer
 }
 
 // NewCommonPriceStreamServerImplement Constructor and runner goroutine Listeners.StartStream
 func NewCommonPriceStreamServerImplement(ctx context.Context, ch chan models.Price) *CommonPriceStreamServerImplement {
-	listener := &service.Listeners{
-		ChanelPrices: ch,
-		Channels:     make(map[string]*service.Chanel),
-	}
-	go listener.StartStream(ctx)
+	poolListeners := service.NewPoolListeners(ctx, ch, 100)
+	go poolListeners.StartListenPool(ctx)
 	return &CommonPriceStreamServerImplement{
-		ch:        ch,
-		listeners: listener,
+		poolListeners: poolListeners,
 	}
 }
 
@@ -35,18 +30,19 @@ func NewCommonPriceStreamServerImplement(ctx context.Context, ch chan models.Pri
 // new connection to Redis, There is only one common connection(group reader) to redis, This type price stream is slower
 // than OwnPriceStream, but you don't have any count limit like count connection to one instance price service.
 func (p *CommonPriceStreamServerImplement) GetPriceStream(_ *protoc.GetPriceStreamRequest, resp protoc.CommonPriceStream_GetPriceStreamServer) error {
+	listener := p.poolListeners.GetListener()
+
 	ch := service.Chanel{
-		AddrListeners: p.listeners,
+		AddrListeners: listener,
 		NameChanel:    uuid.New().String(),
 		Chanel:        make(chan models.Price),
 	}
-	p.listeners.AddChanel(&ch)
-
+	listener.AddChanel(&ch)
 	for {
 		select {
 		case <-resp.Context().Done():
 			log.WithError(resp.Context().Err()).Info()
-			p.listeners.DropChanel(ch.NameChanel)
+			listener.DropChanel(ch.NameChanel)
 			return resp.Context().Err()
 		case data := <-ch.Chanel:
 			err := resp.Send(&protoc.GetPriceStreamResponse{

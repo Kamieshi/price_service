@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net"
+	"runtime"
 
 	rds "github.com/go-redis/redis/v8"
 	log "github.com/sirupsen/logrus"
@@ -33,6 +34,7 @@ func main() {
 	protoc.RegisterOwnPriceStreamServer(grpcServer, &handlers.PriceServerImplement{RedisListener: &rep})
 	protoc.RegisterCommonPriceStreamServer(grpcServer, handlers.NewCommonPriceStreamServerImplement(ctx, ch))
 	log.Info("gRPC server start")
+	log.Info("Count core : ", runtime.NumCPU())
 	log.Info(grpcServer.Serve(listener))
 	log.Info("gRPC server Stop")
 }

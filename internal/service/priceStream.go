@@ -10,6 +10,53 @@ import (
 	"priceService/internal/models"
 )
 
+type PoolListeners struct {
+	ChanelPrices  chan models.Price
+	PullListeners []*Listeners
+	CountChInPool int
+}
+
+func NewPoolListeners(ctx context.Context, ch chan models.Price, countChInPool int) *PoolListeners {
+	pools := make([]Listeners, 100, 100)
+	poolsL := make([]*Listeners, 100, 100)
+	for i := range pools {
+		chListener := make(chan models.Price)
+		pools[i].ChanelPrices = chListener
+		pools[i].Channels = make(map[string]*Chanel)
+		poolsL[i] = &pools[i]
+		go poolsL[i].StartStream(ctx)
+	}
+
+	return &PoolListeners{
+		PullListeners: poolsL,
+		CountChInPool: countChInPool,
+		ChanelPrices:  ch,
+	}
+}
+
+func (p *PoolListeners) StartListenPool(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case data := <-p.ChanelPrices:
+			for _, listener := range p.PullListeners {
+				listener.ChanelPrices <- data
+			}
+		}
+	}
+}
+
+func (p *PoolListeners) GetListener() *Listeners {
+	for {
+		for _, list := range p.PullListeners {
+			if len(list.Channels) <= p.CountChInPool {
+				return list
+			}
+		}
+	}
+}
+
 // Chanel struct
 type Chanel struct {
 	AddrListeners *Listeners

@@ -1,4 +1,4 @@
-package repository
+package service
 
 import (
 	"context"
@@ -12,19 +12,19 @@ import (
 	"priceService/internal/models"
 )
 
-// Redis WorkWithRedis
-type Redis struct {
+// RedisListener WorkWithRedis
+type RedisListener struct {
 	Client *rds.Client
 }
 
-// ListenChanel Return chanel, for this chanel will create new group listener to Redis stream
-func (r *Redis) ListenChanel(ctx context.Context) (chan *models.Price, error) {
+// ListenChanel Return Chanel, for this Chanel will create new group listener to RedisListener stream
+func (r *RedisListener) ListenChanel(ctx context.Context) (chan models.Price, error) {
 	nameGroup := uuid.New().String()
 	status := r.Client.XGroupCreate(ctx, "prices", nameGroup, "$")
 	if status.Err() != nil {
 		return nil, status.Err()
 	}
-	ch := make(chan *models.Price)
+	ch := make(chan models.Price)
 	args := rds.XReadGroupArgs{
 		Group:    nameGroup,
 		Consumer: "Consumer",
@@ -56,7 +56,7 @@ func (r *Redis) ListenChanel(ctx context.Context) (chan *models.Price, error) {
 							continue
 						}
 
-						ch <- &pr
+						ch <- pr
 					}
 				}
 			}

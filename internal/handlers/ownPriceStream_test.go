@@ -9,6 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"priceService/protoc"
 )
 
 func TestGetPriceStream(t *testing.T) {
@@ -16,8 +18,8 @@ func TestGetPriceStream(t *testing.T) {
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
-	client := NewPriceClient(conn)
-	stream, err := client.GetPriceStream(context.Background(), &GetPriceStreamRequest{})
+	client := protoc.NewOwnPriceStreamClient(conn)
+	stream, err := client.GetPriceStream(context.Background(), &protoc.GetPriceStreamRequest{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,9 +44,9 @@ func TestHighLoad(t *testing.T) {
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
-	client := NewPriceClient(conn)
+	client := protoc.NewOwnPriceStreamClient(conn)
 	runClient := func(numb int) {
-		stream, err := client.GetPriceStream(context.Background(), &GetPriceStreamRequest{})
+		stream, err := client.GetPriceStream(context.Background(), &protoc.GetPriceStreamRequest{})
 		if err != nil {
 			t.Fatal(err)
 		}

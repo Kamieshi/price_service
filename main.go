@@ -9,7 +9,8 @@ import (
 	"google.golang.org/grpc"
 
 	"priceService/internal/handlers"
-	"priceService/internal/repository"
+	"priceService/internal/service"
+	"priceService/protoc"
 )
 
 func main() {
@@ -22,15 +23,15 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal()
 	}
-	rep := repository.Redis{Client: client}
+	rep := service.RedisListener{Client: client}
 	ctx := context.Background()
 	ch, err := rep.ListenChanel(ctx)
 	if err != nil {
 		log.WithError(err).Fatal()
 	}
 	grpcServer := grpc.NewServer()
-	handlers.RegisterPriceServer(grpcServer, &handlers.PriceServerImplement{Rep: &rep})
-	handlers.RegisterPriceStreamingServer(grpcServer, handlers.NewPriceStreamingServerImplement(ctx, ch))
+	protoc.RegisterOwnPriceStreamServer(grpcServer, &handlers.PriceServerImplement{RedisListener: &rep})
+	protoc.RegisterCommonPriceStreamServer(grpcServer, handlers.NewCommonPriceStreamServerImplement(ctx, ch))
 	log.Info("gRPC server start")
 	log.Info(grpcServer.Serve(listener))
 	log.Info("gRPC server Stop")

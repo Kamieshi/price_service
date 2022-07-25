@@ -1,15 +1,14 @@
 syntax = "proto3";
-option go_package = "/internal/handlers";
+option go_package = "/protoc";
 package priceService;
 
 
-service Price{
+service OwnPriceStream{
   rpc GetPriceStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
-
 }
 
-service PriceStreaming{
-  rpc HighLoadStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
+service CommonPriceStream{
+  rpc GetPriceStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
 }
 
 message GetPriceStreamRequest{}

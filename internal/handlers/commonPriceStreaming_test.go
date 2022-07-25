@@ -9,10 +9,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"priceService/protoc"
 )
 
-func Loader(client PriceStreamingClient, countClients int, pr bool) {
-	stream, err := client.HighLoadStream(context.Background(), &GetPriceStreamRequest{})
+func Loader(client protoc.CommonPriceStreamClient, countClients int, pr bool) {
+	stream, err := client.GetPriceStream(context.Background(), &protoc.GetPriceStreamRequest{})
 	if err != nil {
 		log.WithError(err).Error()
 	}
@@ -37,12 +39,12 @@ func Loader(client PriceStreamingClient, countClients int, pr bool) {
 }
 
 func TestHighLoadStreamPriceService(t *testing.T) {
-	countClients := 3000
+	countClients := 100
 	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
-	client := NewPriceStreamingClient(conn)
+	client := protoc.NewCommonPriceStreamClient(conn)
 	go Loader(client, countClients, true)
 	for i := 0; i < countClients-1; i++ {
 		go Loader(client, countClients, false)

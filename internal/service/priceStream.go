@@ -2,6 +2,7 @@
 package service
 
 import (
+	"container/list"
 	"context"
 	"sync"
 
@@ -12,29 +13,22 @@ import (
 
 // Chanel struct
 type Chanel struct {
-	AddrListeners *Listeners
-	NameChanel    string
-	Chanel        chan models.Price
+	Disabled bool
+	Chanel   chan models.Price
+	sync.RWMutex
 }
 
 // Listeners Main listener for management map Chanel
 type Listeners struct {
 	ChanelPrices chan models.Price
-	Channels     map[string]*Chanel
+	Channels     *list.List
 	sMutex       sync.RWMutex
 }
 
 // AddChanel Add Chanel in Listeners.Channels
 func (l *Listeners) AddChanel(chanel *Chanel) {
 	l.sMutex.Lock()
-	l.Channels[chanel.NameChanel] = chanel
-	l.sMutex.Unlock()
-}
-
-// DropChanel Drop Chanel from Listeners.Channels and close chan *models.Price
-func (l *Listeners) DropChanel(chName string) {
-	l.sMutex.Lock()
-	delete(l.Channels, chName)
+	l.Channels.PushBack(chanel)
 	l.sMutex.Unlock()
 }
 
@@ -45,11 +39,18 @@ func (l *Listeners) StartStream(ctx context.Context) {
 		case <-ctx.Done():
 			log.WithError(ctx.Err()).Info()
 		case data := <-l.ChanelPrices:
-			l.sMutex.RLock()
-			for _, ch := range l.Channels {
-				ch.Chanel <- data
+			for ch := l.Channels.Front(); ch != nil; ch = ch.Next() {
+				ch.Value.(*Chanel).RLock()
+				if ch.Value.(*Chanel).Disabled {
+					ch.Value.(*Chanel).RUnlock()
+					ch.Value.(*Chanel).Lock()
+					l.Channels.Remove(ch)
+					ch.Value.(*Chanel).Unlock()
+					continue
+				}
+				ch.Value.(*Chanel).Chanel <- data
+				ch.Value.(*Chanel).RUnlock()
 			}
-			l.sMutex.RUnlock()
 		}
 	}
 }

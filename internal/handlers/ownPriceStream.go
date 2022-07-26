@@ -7,8 +7,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/Kamieshi/price_service/internal/service"
-	"github.com/Kamieshi/price_service/protoc"
+	"priceService/internal/service"
+	"priceService/protoc"
 )
 
 // PriceServerImplement Implement Price Server

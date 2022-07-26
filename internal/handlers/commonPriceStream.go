@@ -6,9 +6,9 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/Kamieshi/price_service/internal/models"
-	"github.com/Kamieshi/price_service/internal/service"
-	"github.com/Kamieshi/price_service/protoc"
+	"priceService/internal/models"
+	"priceService/internal/service"
+	"priceService/protoc"
 )
 
 // CommonPriceStreamServerImplement Implement gRPC interface PriceStreamingServer

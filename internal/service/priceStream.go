@@ -7,7 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/Kamieshi/price_service/internal/models"
+	"priceService/internal/models"
 )
 
 type PoolListeners struct {

@@ -9,9 +9,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
-	"github.com/Kamieshi/price_service/internal/handlers"
-	"github.com/Kamieshi/price_service/internal/service"
-	"github.com/Kamieshi/price_service/protoc"
+	"priceService/internal/handlers"
+	"priceService/internal/service"
+	"priceService/protoc"
 )
 
 func main() {

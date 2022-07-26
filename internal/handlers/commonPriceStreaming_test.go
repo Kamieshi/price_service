@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/Kamieshi/price_service/protoc"
+	"priceService/protoc"
 )
 
 func Loader(client protoc.CommonPriceStreamClient, countClients int, pr bool) {

@@ -1,4 +1,4 @@
-module priceService
+module github.com/Kamieshi/price_service
 
 go 1.18
 

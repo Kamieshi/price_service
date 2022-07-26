@@ -7,7 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"priceService/internal/models"
+	"github.com/Kamieshi/price_service/internal/models"
 )
 
 // Chanel struct

@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 
-	"priceService/internal/models"
+	"github.com/Kamieshi/price_service/internal/models"
 )
 
 // RedisListener WorkWithRedis

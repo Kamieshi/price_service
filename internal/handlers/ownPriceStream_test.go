@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"priceService/protoc"
+	"github.com/Kamieshi/price_service/protoc"
 )
 
 func TestGetPriceStream(t *testing.T) {

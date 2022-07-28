@@ -5,9 +5,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/Kamieshi/price_service/internal/model"
 	log "github.com/sirupsen/logrus"
-
-	"priceService/internal/model"
 )
 
 // PoolListeners Pool from common handler

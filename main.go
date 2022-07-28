@@ -5,13 +5,12 @@ import (
 	"net"
 	"runtime"
 
+	"github.com/Kamieshi/price_service/internal/handler"
+	"github.com/Kamieshi/price_service/internal/service"
+	"github.com/Kamieshi/price_service/protoc"
 	rds "github.com/go-redis/redis/v8"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-
-	"priceService/internal/handler"
-	"priceService/internal/service"
-	"priceService/protoc"
 )
 
 func main() {

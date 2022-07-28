@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Kamieshi/price_service/internal/model"
 	rds "github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-
-	"priceService/internal/model"
 )
 
 // RedisListener WorkWithRedis

@@ -5,10 +5,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/Kamieshi/price_service/internal/service"
+	"github.com/Kamieshi/price_service/protoc"
 	log "github.com/sirupsen/logrus"
-
-	"priceService/internal/service"
-	"priceService/protoc"
 )
 
 // PriceServerImplement Implement Price Server

@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Kamieshi/price_service/protoc"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	"priceService/protoc"
 )
 
 func TestGetPriceStream(t *testing.T) {

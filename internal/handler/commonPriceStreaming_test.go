@@ -3,14 +3,12 @@ package handler
 import (
 	"context"
 	"fmt"
-	"testing"
 	"time"
 
+	"github.com/Kamieshi/price_service/protoc"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	"priceService/protoc"
 )
 
 func Loader(client protoc.CommonPriceStreamClient, countClients int, pr bool) {
@@ -38,7 +36,7 @@ func Loader(client protoc.CommonPriceStreamClient, countClients int, pr bool) {
 	}
 }
 
-func TestHighLoadStreamPriceService(t *testing.T) {
+func TestHighLoadStreamgithub.com/Kamieshi/price_service(t *testing.T) {
 	countClients := 1
 	conn, err := grpc.Dial("localhost:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

@@ -3,12 +3,11 @@ package handler
 import (
 	"context"
 
+	"github.com/Kamieshi/price_service/internal/model"
+	"github.com/Kamieshi/price_service/internal/service"
+	"github.com/Kamieshi/price_service/protoc"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-
-	"priceService/internal/model"
-	"priceService/internal/service"
-	"priceService/protoc"
 )
 
 // CommonPriceStreamServerImplement Implement gRPC interface PriceStreamingServer

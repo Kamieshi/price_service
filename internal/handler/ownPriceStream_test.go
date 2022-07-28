@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"context"
@@ -60,8 +60,8 @@ func TestHighLoad(t *testing.T) {
 			tt, err := time.Parse("2006-01-02T15:04:05.000TZ-07:00", data.Time)
 			sum += time.Since(tt).Nanoseconds()
 			count += 1
-			if count == 100 && numb == 0 {
-				fmt.Println(countClients, "clients  AVG : ", time.Duration(sum/100))
+			if count == 10 && numb == 0 {
+				fmt.Println(countClients, "clients  AVG : ", time.Duration(sum/10))
 				sum = 0
 				count = 0
 			}
@@ -70,5 +70,5 @@ func TestHighLoad(t *testing.T) {
 	for i := 0; i < countClients; i++ {
 		go runClient(i)
 	}
-	time.Sleep(100 * time.Second)
+	time.Sleep(100 * time.Minute)
 }

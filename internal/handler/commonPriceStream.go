@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"priceService/internal/models"
+	"priceService/internal/model"
 	"priceService/internal/service"
 	"priceService/protoc"
 )
@@ -18,7 +18,7 @@ type CommonPriceStreamServerImplement struct {
 }
 
 // NewCommonPriceStreamServerImplement Constructor and runner goroutine Listeners.StartStream
-func NewCommonPriceStreamServerImplement(ctx context.Context, ch chan models.Price) *CommonPriceStreamServerImplement {
+func NewCommonPriceStreamServerImplement(ctx context.Context, ch chan model.Price) *CommonPriceStreamServerImplement {
 	poolListeners := service.NewPoolListeners(ctx, ch, 100)
 	go poolListeners.StartListenPool(ctx)
 	return &CommonPriceStreamServerImplement{
@@ -35,7 +35,7 @@ func (p *CommonPriceStreamServerImplement) GetPriceStream(_ *protoc.GetPriceStre
 	ch := service.Chanel{
 		AddrListeners: listener,
 		NameChanel:    uuid.New().String(),
-		Chanel:        make(chan models.Price),
+		Chanel:        make(chan model.Price),
 	}
 	listener.AddChanel(&ch)
 	for {

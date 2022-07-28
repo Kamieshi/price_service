@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 
-	"priceService/internal/models"
+	"priceService/internal/model"
 )
 
 // RedisListener WorkWithRedis
@@ -18,13 +18,13 @@ type RedisListener struct {
 }
 
 // ListenChanel Return Chanel, for this Chanel will create new group listener to RedisListener stream
-func (r *RedisListener) ListenChanel(ctx context.Context) (chan models.Price, error) {
+func (r *RedisListener) ListenChanel(ctx context.Context) (chan model.Price, error) {
 	nameGroup := uuid.New().String()
 	status := r.Client.XGroupCreate(ctx, "prices", nameGroup, "$")
 	if status.Err() != nil {
 		return nil, status.Err()
 	}
-	ch := make(chan models.Price)
+	ch := make(chan model.Price)
 	args := rds.XReadGroupArgs{
 		Group:    nameGroup,
 		Consumer: "Consumer",
@@ -48,7 +48,7 @@ func (r *RedisListener) ListenChanel(ctx context.Context) (chan models.Price, er
 				resVal := resCmd.Val()
 				for _, comm := range resVal {
 					for _, mess := range comm.Messages {
-						var pr models.Price
+						var pr model.Price
 						payLoad := fmt.Sprint(mess.Values["price"])
 						err := json.Unmarshal([]byte(payLoad), &pr)
 						if err != nil {

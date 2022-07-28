@@ -7,20 +7,22 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"priceService/internal/models"
+	"priceService/internal/model"
 )
 
+// PoolListeners Pool from common handler
 type PoolListeners struct {
-	ChanelPrices  chan models.Price
+	ChanelPrices  chan model.Price
 	PullListeners []*Listeners
 	CountChInPool int
 }
 
-func NewPoolListeners(ctx context.Context, ch chan models.Price, countChInPool int) *PoolListeners {
+// NewPoolListeners constructor
+func NewPoolListeners(ctx context.Context, ch chan model.Price, countChInPool int) *PoolListeners {
 	pools := make([]Listeners, 100, 100)
 	poolsL := make([]*Listeners, 100, 100)
 	for i := range pools {
-		chListener := make(chan models.Price)
+		chListener := make(chan model.Price)
 		pools[i].ChanelPrices = chListener
 		pools[i].Channels = make(map[string]*Chanel)
 		poolsL[i] = &pools[i]
@@ -34,6 +36,7 @@ func NewPoolListeners(ctx context.Context, ch chan models.Price, countChInPool i
 	}
 }
 
+// StartListenPool constructor
 func (p *PoolListeners) StartListenPool(ctx context.Context) {
 	for {
 		select {
@@ -61,12 +64,12 @@ func (p *PoolListeners) GetListener() *Listeners {
 type Chanel struct {
 	AddrListeners *Listeners
 	NameChanel    string
-	Chanel        chan models.Price
+	Chanel        chan model.Price
 }
 
 // Listeners Main listener for management map Chanel
 type Listeners struct {
-	ChanelPrices chan models.Price
+	ChanelPrices chan model.Price
 	Channels     map[string]*Chanel
 	sMutex       sync.RWMutex
 }
@@ -78,7 +81,7 @@ func (l *Listeners) AddChanel(chanel *Chanel) {
 	l.sMutex.Unlock()
 }
 
-// DropChanel Drop Chanel from Listeners.Channels and close chan *models.Price
+// DropChanel Drop Chanel from Listeners.Channels and close chan *model.Price
 func (l *Listeners) DropChanel(chName string) {
 	l.sMutex.Lock()
 	delete(l.Channels, chName)

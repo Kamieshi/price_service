@@ -1,5 +1,5 @@
-// Package handlers  handler for work with gRPC server
-package handlers
+// Package handler  handler for work with gRPC server
+package handler
 
 import (
 	"context"

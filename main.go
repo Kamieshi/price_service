@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
-	"priceService/internal/handlers"
+	"priceService/internal/handler"
 	"priceService/internal/service"
 	"priceService/protoc"
 )
@@ -31,8 +31,8 @@ func main() {
 		log.WithError(err).Fatal()
 	}
 	grpcServer := grpc.NewServer()
-	protoc.RegisterOwnPriceStreamServer(grpcServer, &handlers.PriceServerImplement{RedisListener: &rep})
-	protoc.RegisterCommonPriceStreamServer(grpcServer, handlers.NewCommonPriceStreamServerImplement(ctx, ch))
+	protoc.RegisterOwnPriceStreamServer(grpcServer, &handler.PriceServerImplement{RedisListener: &rep})
+	protoc.RegisterCommonPriceStreamServer(grpcServer, handler.NewCommonPriceStreamServerImplement(ctx, ch))
 	log.Info("gRPC server start")
 	log.Info("Count core : ", runtime.NumCPU())
 	log.Info(grpcServer.Serve(listener))

@@ -1,39 +1,41 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"net"
 	"runtime"
 
+	"github.com/Kamieshi/price_service/internal/config"
 	"github.com/Kamieshi/price_service/internal/handler"
 	"github.com/Kamieshi/price_service/internal/service"
 	"github.com/Kamieshi/price_service/protoc"
 	rds "github.com/go-redis/redis/v8"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
 func main() {
+	conf, err := config.GetConfig()
+	if err != nil {
+		logrus.WithError(err).Fatal("Parse config from OS ENV")
+		return
+	}
+
 	client := rds.NewClient(&rds.Options{
-		Addr:     "localhost:6379",
+		Addr:     fmt.Sprintf("%s:%s", conf.RedisHost, conf.RedisPort),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-	listener, err := net.Listen("tcp", ":5300")
+	listener, err := net.Listen("tcp", ":"+conf.PortRPC)
 	if err != nil {
-		log.WithError(err).Fatal()
+		logrus.WithError(err).Fatal()
 	}
 	rep := service.RedisListener{Client: client}
-	ctx := context.Background()
-	ch, err := rep.ListenChanel(ctx)
-	if err != nil {
-		log.WithError(err).Fatal()
-	}
 	grpcServer := grpc.NewServer()
 	protoc.RegisterOwnPriceStreamServer(grpcServer, &handler.PriceServerImplement{RedisListener: &rep})
-	protoc.RegisterCommonPriceStreamServer(grpcServer, handler.NewCommonPriceStreamServerImplement(ctx, ch))
-	log.Info("gRPC server start")
-	log.Info("Count core : ", runtime.NumCPU())
-	log.Info(grpcServer.Serve(listener))
-	log.Info("gRPC server Stop")
+	logrus.Info("gRPC server start")
+	logrus.Info("Count core : ", runtime.NumCPU())
+	logrus.Info("Start Port: ", conf.PortRPC)
+	logrus.Info(grpcServer.Serve(listener))
+	logrus.Info("gRPC server Stop")
 }

@@ -3,6 +3,7 @@ module github.com/Kamieshi/price_service
 go 1.18
 
 require (
+	github.com/caarlos0/env/v6 v6.9.3
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.1.2
 	github.com/sirupsen/logrus v1.9.0

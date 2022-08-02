@@ -7,10 +7,6 @@ service OwnPriceStream{
   rpc GetPriceStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
 }
 
-service CommonPriceStream{
-  rpc GetPriceStream(GetPriceStreamRequest) returns (stream GetPriceStreamResponse){}
-}
-
 message GetPriceStreamRequest{}
 
 message GetPriceStreamResponse {
